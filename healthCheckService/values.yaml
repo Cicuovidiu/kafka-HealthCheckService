@@ -1,0 +1,42 @@
+namespace: health-check
+releaseName: health-check-service
+
+deployment:
+  strategy: RollingUpdate
+
+image:
+  repository: ovidiucicu/kafka-microservices
+  tag: "1.1"
+  pullPolicy: Always
+  imagePullSecret: docker-registry-secret
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+kafka:
+  broker: kafka-test.kafka.svc.cluster.local:9092
+  topic: health_checks_topic
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+secret:
+  name: kafka-credential
+  user: user
+  password: password
+
+replicaCount: 1 
+minReplicas: 2   
+maxReplicas: 3  
+
+hpa:
+  enabled: true  
+  cpuUtilizationTarget: 80
+

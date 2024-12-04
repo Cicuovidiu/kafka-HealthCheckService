@@ -1,0 +1,42 @@
+replicaCount: 1
+namespace: consumer-check
+releaseName: consumer-health-check
+
+deployment:
+  strategy: RollingUpdate
+
+image:
+  repository: ovidiucicu/kafka-microservices
+  tag: "consumer"
+  pullPolicy: Always
+  imagePullSecret: docker-registry-secret
+
+service:
+  type: ClusterIP
+  port: 5001
+  targetPort: 5001
+
+kafka:
+  broker: kafka-test.kafka.svc.cluster.local:9092
+  topic: health_checks_topic
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+secret:
+  name: kafka-credential
+  user: user
+  password: password
+
+replicaCount: 1 
+minReplicas: 2   
+maxReplicas: 3  
+
+hpa:
+  enabled: true  
+  cpuUtilizationTarget: 80

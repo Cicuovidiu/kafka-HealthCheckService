@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topic-creator
+  namespace: kafka
+spec:
+  template:
+    spec:
+      containers:
+      - name: kafka-topic-creator
+        image: docker.io/bitnami/kafka:3.9.0-debian-12-r1
+        command:
+        - /bin/sh
+        - -c
+        - |
+          kafka-topics.sh --create --create --command-config /tmp/client.properties --bootstrap-server kafka-test.kafka.svc.cluster.local:9092 --topic health_checks_topic --partitions 1 --replication-factor 3
+        volumeMounts:
+        - name: config-volume
+          mountPath: /tmp/client.properties
+          subPath: client.properties 
+        env:
+        - name: BOOTSTRAP_USER
+          valueFrom:
+            secretKeyRef:
+              name: kafka-credentials-bootstrap
+              key: user
+        - name: BOOTSTRAP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kafka-credentials-bootstrap
+              key: password
+      restartPolicy: Never
+      volumes:
+      - name: config-volume
+        configMap:
+          name: client-configure-cm
+          items:
+          - key: test.properties
+            path: client.properties
