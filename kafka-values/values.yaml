@@ -1,0 +1,23 @@
+replicaCount: 1
+
+zookeeper:
+  replicaCount: 1
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+externalAccess:
+  enabled: false
+
+resources:
+  requests:
+    memory: 500Mb
+  limits:
+    memory: 1Gi
+
+logLevel: INFO
+
+auth:
+  clientProtocol: plaintext
+  interBrokerProtocol: plaintext
